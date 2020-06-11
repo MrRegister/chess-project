@@ -1,5 +1,6 @@
 package chess.gui;
 
+import chess.engine.Alliance;
 import chess.engine.board.Board;
 import chess.engine.board.BoardUtils;
 import chess.engine.board.Move;
@@ -23,14 +24,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static javax.swing.SwingUtilities.isRightMouseButton;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 
 public class Table {
 
     private final JFrame gameFrame;
     private final GameHistoryPanel gameHistoryPanel;
-    private final TakenPiecesPanel takenPiecesPanel;
     private final BoardPanel boardPanel;
     private final MoveLog moveLog;
 
@@ -40,10 +39,11 @@ public class Table {
     private Tile destinationTile;
     private Piece humanMovedPiece;
     private BoardDirection boardDirection;
+    public static Alliance humanAlliance;
 
     private boolean highlightLegalMoves;
 
-    private final static Dimension OUTER_FRAME_DIMENSION = new Dimension(960, 800);
+    private final static Dimension OUTER_FRAME_DIMENSION = new Dimension(940, 800);
     private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(400, 350);
     private final static Dimension TILE_PANEL_DIMENSION = new Dimension(10, 10);
     private static String defaultPieceImagesPath = "art/pieces/simple/";
@@ -59,12 +59,11 @@ public class Table {
         this.gameFrame.setSize(OUTER_FRAME_DIMENSION);
         this.chessBoard = Board.createStandardBoard();
         this.gameHistoryPanel = new GameHistoryPanel();
-        this.takenPiecesPanel = new TakenPiecesPanel();
         this.boardPanel = new BoardPanel();
         this.moveLog = new MoveLog();
         this.boardDirection = BoardDirection.NORMAL;
         this.highlightLegalMoves = true;
-        this.gameFrame.add(this.takenPiecesPanel, BorderLayout.WEST);
+        this.humanAlliance = Alliance.WHITE;
         this.gameFrame.add(this.boardPanel, BorderLayout.CENTER);
         this.gameFrame.add(this.gameHistoryPanel, BorderLayout.EAST);
         this.gameFrame.setUndecorated(false);
@@ -81,14 +80,14 @@ public class Table {
 
     private JMenu createFileMenu() {
         final JMenu fileMenu = new JMenu("File");
-        final JMenuItem openPGN = new JMenuItem("Load PGN File");
-        openPGN.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("load pgn");
-            }
-        });
-        fileMenu.add(openPGN);
+        //final JMenuItem openPGN = new JMenuItem("Load PGN File");
+        //openPGN.addActionListener(new ActionListener() {
+        //            @Override
+        //            public void actionPerformed(ActionEvent e) {
+        //                System.out.println("load pgn");
+        //            }
+        //        });
+        //        fileMenu.add(openPGN);
         final JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -226,6 +225,11 @@ public class Table {
             addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(final MouseEvent e) {
+
+                }
+
+                @Override
+                public void mousePressed(final MouseEvent e) {
                     if(isLeftMouseButton(e)){
                         if(sourceTile == null) {
                             sourceTile = chessBoard.getTile(tileId);
@@ -249,21 +253,10 @@ public class Table {
                             @Override
                             public void run() {
                                 gameHistoryPanel.redo(chessBoard, moveLog);
-                                takenPiecesPanel.redo(moveLog);
                                 boardPanel.drawBoard(chessBoard);
                             }
                         });
-                    }else if(isRightMouseButton(e)){
-                        sourceTile = null;
-                        destinationTile = null;
-                        humanMovedPiece = null;
                     }
-
-                }
-
-                @Override
-                public void mousePressed(final MouseEvent e) {
-
                 }
 
                 @Override
@@ -308,7 +301,12 @@ public class Table {
             if(highlightLegalMoves) {
                 for(final Move move : pieceLegalMoves(board)){
                     if(move.getDestinationCoordinate() == this.tileId) {
+                        MoveTransition transition = board.currentPlayer().makeMove(move);
+                        if(!transition.getMoveStatus().isDone()){
+                            continue;
+                        }
                         try {
+                            removeAll();
                             add(new JLabel(new ImageIcon(ImageIO.read(new File("art/misc/legal_dot.gif")))));
                         }catch(Exception e) {
                             e.printStackTrace();

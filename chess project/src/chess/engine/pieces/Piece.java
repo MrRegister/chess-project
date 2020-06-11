@@ -71,7 +71,7 @@ public abstract class Piece {
 	
 	public abstract Piece movePiece(Move move);
 
-	public enum PieceType {
+    public enum PieceType {
 		
 		PAWN("P", 100) {
 			@Override
