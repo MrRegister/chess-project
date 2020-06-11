@@ -76,12 +76,16 @@ public abstract class Piece {
 		PAWN("P", 100) {
 			@Override
 			public boolean isKing() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 
 			@Override
 			public boolean isRook() {
+				return false;
+			}
+
+			@Override
+			public boolean isKnight() {
 				return false;
 			}
 		},
@@ -95,6 +99,11 @@ public abstract class Piece {
 			public boolean isRook() {
 				return false;
 			}
+
+			@Override
+			public boolean isKnight() {
+				return true;
+			}
 		},
 		BISHOP("B", 430) {
 			@Override
@@ -104,6 +113,11 @@ public abstract class Piece {
 
 			@Override
 			public boolean isRook() {
+				return false;
+			}
+
+			@Override
+			public boolean isKnight() {
 				return false;
 			}
 		},
@@ -117,6 +131,11 @@ public abstract class Piece {
 			public boolean isRook() {
 				return true;
 			}
+
+			@Override
+			public boolean isKnight() {
+				return false;
+			}
 		},
 		QUEEN("Q", 900) {
 			@Override
@@ -128,6 +147,11 @@ public abstract class Piece {
 			public boolean isRook() {
 				return false;
 			}
+
+			@Override
+			public boolean isKnight() {
+				return false;
+			}
 		},
 		KING("K", 10000) {
 			@Override
@@ -137,6 +161,11 @@ public abstract class Piece {
 
 			@Override
 			public boolean isRook() {
+				return false;
+			}
+
+			@Override
+			public boolean isKnight() {
 				return false;
 			}
 		};
@@ -161,7 +190,8 @@ public abstract class Piece {
 		public abstract boolean isKing();
 
 		public abstract boolean isRook();
-		
+
+		public abstract boolean isKnight();
 	}
 	
 }
